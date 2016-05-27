@@ -147,10 +147,6 @@ include_directories(
     ${CMAKE_BINARY_DIR}/include
     ${Boost_INCLUDE_DIRS}
     ${CPPUNIT_INCLUDE_DIRS}
-    # ${ETTUS_INCLUDE_DIRS} #for rfnoc
-    #${ETTUS_SWIG_INCLUDE_DIRS} #for rfnoc
-    #${PC_ETTUS_INCLUDEDIR}
-    #${ETTUS_LIBRARIES}
     ${GNURADIO_ALL_INCLUDE_DIRS}
 )
 
@@ -158,10 +154,6 @@ link_directories(
     ${Boost_LIBRARY_DIRS}
     ${CPPUNIT_LIBRARY_DIRS}
     ${GNURADIO_RUNTIME_LIBRARY_DIRS}
-    #${ETTUS_LIBRARIES}
-    #${PC_ETTUS_LIBDIR}
-    #${gnuradio-ettus}
-  
 )
 
 ###########################################################################

@@ -56,8 +56,8 @@ class ModToolNewModule(ModTool):
     def run(self):
         """
         * Copy the example dir recursively
-        * Open all files, rename howto and HOWTO to the module name
-        * Rename files and directories that contain the word howto
+        * Open all files, rename rfnoc_example and RFNOC_EXAMPLE to the module name
+        * Rename files and directories that contain the word rfnoc_example
         """
         print "Creating out-of-tree module in %s..." %self._dir,
         try:
@@ -69,12 +69,12 @@ class ModToolNewModule(ModTool):
             for filename in files:
                 f = os.path.join(root,filename)
                 s = open(f, 'r').read()
-                s = s.replace('howto', self._info['modname'])
-                s = s.replace('HOWTO', self._info['modname'].upper())
+                s = s.replace('rfnoc_example', self._info['modname'])
+                s = s.replace('RFNOC_EXAMPLE', self._info['modname'].upper())
                 open(f, 'w').write(s)
-                if filename.find('howto') != -1:
-                    os.rename(f, os.path.join(root, filename.replace('howto', self._info['modname'])))
-            if os.path.basename(root) == 'howto';
+                if filename.find('rfnoc_example') != -1:
+                    os.rename(f, os.path.join(root, filename.replace('rfnoc_example', self._info['modname'])))
+            if os.path.basename(root) == 'rfnoc_example';
                 os.rename(root, os.path.join(os.path.dirname(root), self._info['modname']))
         print "Done."
         ### SCM not added for vanilla version    

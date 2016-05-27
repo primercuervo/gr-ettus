@@ -109,7 +109,7 @@ class ModTool(object):
             self._info['includedir'] = 'include'
         self._file['cminclude'] = os.path.join(self._info['includedir'], 'CMakeLists.txt')
         self._file['cmswig'] = os.path.join('swig', 'CMakeLists.txt')
-        self._file['cmfind'] = os.path.join('cmake', 'Modules', 'howtoConfig.cmake')
+        self._file['cmfind'] = os.path.join('cmake', 'Modules', 'rfnoc_exampleConfig.cmake')
 
 
     #def _setup_scm(self, mode='active'):

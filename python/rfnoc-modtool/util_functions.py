@@ -7,7 +7,7 @@ import sys
 
 def get_modname():
     # OK, there's no gnuradio.project. So, we need to guess.
-    modname_trans = {'howto-write-a-block': 'howto'}
+    modname_trans = {'howto-write-a-block': 'rfnoc_example'}
     cmfile = open('CMakeLists.txt', 'r').read()
     regexp = r'(project\s*\(\s*|GR_REGISTER_COMPONENT\(")gr-(?P<modname>[a-zA-Z0-9-_]+)(\s*(CXX)?|" ENABLE)'
     try:
