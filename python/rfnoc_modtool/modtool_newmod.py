@@ -29,12 +29,12 @@ class ModToolNewModule(ModTool):
     def setup(self, options, args):
         #COPYING: don't call ModTool.setup(), that assumes an existing module. \\\\\ Check where there is this assumption.
         self._info['modname'] = options.module_name
-        if self._info['modname'] os None:
+        if self._info['modname'] is None:
             if len(args) >= 2:
                 self._info['modname'] = args[1]
             else:
                 self._info['modname'] = raw_input('Name of the new module: ')
-        if not re.match('[a-zA-Z0-9_]+$', self._info['modname']:
+        if not re.match('[a-zA-Z0-9_]+$', self._info['modname']):
                 raise ModToolException('Invalid module name.')
         self._dir = options.directory
         if self._dir == '.':
@@ -46,7 +46,7 @@ class ModToolNewModule(ModTool):
         else:
             raise ModToolException('The given directory exists.')
         if options.srcdir is None:
-            options.srcdir  = '~/src/prefix/src/gr-ettus/rfnoc-modtool/rfnoc-newmod/' ### Hardcoded, use pybombs prefix instead
+            options.srcdir  = '~/src/prefix/src/gr-ettus/rfnoc_modtool/rfnoc-newmod/' ### Hardcoded, use pybombs prefix instead
         self._srcdir = gr.prefs().get_string('modtool', 'newmod_path', options.srcdir)
         if not os.path.isdir(self._srcdir):
             raise ModToolException('Could not find rfnoc-newmod source dir')
@@ -74,7 +74,7 @@ class ModToolNewModule(ModTool):
                 open(f, 'w').write(s)
                 if filename.find('rfnoc_example') != -1:
                     os.rename(f, os.path.join(root, filename.replace('rfnoc_example', self._info['modname'])))
-            if os.path.basename(root) == 'rfnoc_example';
+            if os.path.basename(root) == 'rfnoc_example':
                 os.rename(root, os.path.join(os.path.dirname(root), self._info['modname']))
         print "Done."
         ### SCM not added for vanilla version    

@@ -25,10 +25,11 @@ description here (python/__init__.py).
 
 # import swig generated symbols into the ettus namespace
 try:
-	# this might fail if the module is python-only
-	from ettus_swig import *
+    # this might fail if the module is python-only
+    from ettus_swig import *
+    from rfnoc_modtool import *
 except ImportError:
-	pass
+    pass
 
 # import any pure python here
 #

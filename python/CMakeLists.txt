@@ -44,7 +44,7 @@ set(GR_TEST_PYTHON_DIRS ${CMAKE_BINARY_DIR}/swig)
 
 
 ########################################################################
-# Add subdirectories for rfnoc-modtool
+# Add subdirectories for rfnoc_modtool
 ########################################################################
-add_subdirectory(utils)
-add_subdirectory(rfnoc-modtool)
+#add_subdirectory(utils)
+#add_subdirectory(rfnoc_modtool)

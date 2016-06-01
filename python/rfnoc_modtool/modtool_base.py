@@ -16,7 +16,7 @@ class ModToolException(BaseException):
 class ModTool(object):
     """ Base class for all modtool command classes. """
     name = 'base'
-    def __init__(self)
+    def __init__(self):
         self._subdirs = ['lib', 'include', 'python', 'swig', 'grc', 'rfnoc'] #List subdirs where stuff happens
         self._has_subdirs = {}
         self._skip_subdirs = {}
@@ -32,7 +32,7 @@ class ModTool(object):
         """ Init the option parser. If derived classes need to add options,
         override this and call the parent function. """
         parser = OptionParser(add_help_option=False)
-        parser.usage = '%prog ' + self.name + ' [options] <PATTERN> \n' + \ 
+        parser.usage = '%prog ' + self.name + ' [options] <PATTERN> \n' + \
                        ' Call "%prog ' + self.name + '" without any options to run it interactively.'
         ogroup = OptionGroup(parser, "General options")
         ogroup.add_option("-h", "--help", action="help", help="Displays this help message.")
@@ -51,7 +51,7 @@ class ModTool(object):
         ogroup.add_option("--skip-grc", action="store_true", default=False,
                 help="Don't do anything in the grc/ subdirectory.")
         ogroup.add_option("--scm-mode", type="choice", choices=('yes', 'no', 'auto'),
-                default=gr.prefs().get_string('modtool', 'scm_mode', 'no'),
+                default=gr.prefs().get_string('rfnocmodtool', 'scm_mode', 'no'),
                 help="Use source control management (yes, no or auto).")
         ogroup.add_option("-y", "--yes", action="store_true", default=False,
                 help="Answer all questions with 'yes'. This can overwrite and delete your files, so be careful.")
@@ -87,7 +87,6 @@ class ModTool(object):
         self._setup_files()
         self._info['yes'] = options.yes
         self.options = options
-        #scm
 
     def _setup_files(self): ###Somewhere here add the rfnoc folder, when the cmakelist is already set up
         """ Initialise the self._file[] dictionary """
@@ -110,17 +109,6 @@ class ModTool(object):
         self._file['cminclude'] = os.path.join(self._info['includedir'], 'CMakeLists.txt')
         self._file['cmswig'] = os.path.join('swig', 'CMakeLists.txt')
         self._file['cmfind'] = os.path.join('cmake', 'Modules', 'rfnoc_exampleConfig.cmake')
-
-
-    #def _setup_scm(self, mode='active'):
-    #    """ Initialize source control management. """
-    #    if mode == 'active':
-    #        self.scm = SCMRepoFactory(self.options, '.').make_active_scm_manager()
-    #    else:
-    #        self.scm = SCMRepoFactory(self.options, '.').make_empty_scm_manager()
-    #    if self.scm is None:
-    #        print "Error: Can't set up SCM."
-    #        exit(1)
 
     def _check_directory(self, directory):
         """ Guesses if dir is a valid GNU Radio module | RFNoC directory by looking for
@@ -166,18 +154,15 @@ class ModTool(object):
         """ Override this. """
         pass
 
-
-    def get_class_dict(the_globals):
-        " Return a dictionary of the available commands in the form command->class "
-        classdict = {}
-        for g in the_globals:
-            try:
-                if issubclass(g, ModTool):
-                    classdict[g.name] = g
-                    for a in g.aliases:
-                        classdict[a] = g
-            except (TypeError, AttributeError):
-                pass
-        return classdict
-
- 
+def get_class_dict(the_globals):
+    " Return a dictionary of the available commands in the form command->class "
+    classdict = {}
+    for g in the_globals:
+        try:
+            if issubclass(g, ModTool):
+                classdict[g.name] = g
+                for a in g.aliases:
+                    classdict[a] = g
+        except (TypeError, AttributeError):
+            pass
+    return classdict
