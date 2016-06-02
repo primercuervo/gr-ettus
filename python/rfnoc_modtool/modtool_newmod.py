@@ -11,7 +11,7 @@ from modtool_base import ModTool, ModToolException ###TODO: add modtool base. Ch
 
 class ModToolNewModule(ModTool):
     """Create a new out-of-tree module """
-    name = 'newmode'
+    name = 'newmod'
     aliases =('nm', 'create')
     def __init__(self):
         ModTool.__init__(self)
@@ -21,7 +21,7 @@ class ModToolNewModule(ModTool):
         parser = ModTool.setup_parser(self)
         parser.usage = '%prog nm [options]. \n Call %prog without any options to run it interactively.'
         ogroup = OptionGroup(parser, "New out-of-tree module options")
-        ogroup.add_option("--srcdir", type-"string",
+        ogroup.add_option("--srcdir", type="string",
                 help="Source directory for the module template.")
         parser.add_option_group(ogroup)
         return parser

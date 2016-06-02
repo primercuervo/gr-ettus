@@ -10,7 +10,7 @@ def main():
     if command is None:
         print 'Usage: ' + Templates['usage']
         exit(2)
-    rfnoc_modtool = cmd_dict[command()]
+    rfnoc_modtool = cmd_dict[command]()
     try:
         (options, args) = rfnoc_modtool.parser.parse_args()
         rfnoc_modtool.setup(options, args)

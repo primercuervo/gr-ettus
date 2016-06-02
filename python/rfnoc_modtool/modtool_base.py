@@ -8,6 +8,7 @@ from optparse import OptionParser, OptionGroup
 
 from gnuradio import gr
 from util_functions import get_modname
+from scm import SCMRepoFactory
 
 class ModToolException(BaseException):
     """ Standard exception for modtool classes. """
@@ -87,6 +88,7 @@ class ModTool(object):
         self._setup_files()
         self._info['yes'] = options.yes
         self.options = options
+        self._setup_scm()
 
     def _setup_files(self): ###Somewhere here add the rfnoc folder, when the cmakelist is already set up
         """ Initialise the self._file[] dictionary """
@@ -109,6 +111,16 @@ class ModTool(object):
         self._file['cminclude'] = os.path.join(self._info['includedir'], 'CMakeLists.txt')
         self._file['cmswig'] = os.path.join('swig', 'CMakeLists.txt')
         self._file['cmfind'] = os.path.join('cmake', 'Modules', 'rfnoc_exampleConfig.cmake')
+
+    def _setup_scm(self, mode='active'):
+        """Initialize source control management. """
+        if mode == 'active':
+            self.scm = SCMRepoFactory(self.options, '.').make_active_scm_manager()
+        else:
+            self.scm = SCMRepoFactory(self.options, '.').make_empty_scm_manager()
+        if self.scm is None:
+            print "Error: can't set up SCM"
+            exit(1)
 
     def _check_directory(self, directory):
         """ Guesses if dir is a valid GNU Radio module | RFNoC directory by looking for

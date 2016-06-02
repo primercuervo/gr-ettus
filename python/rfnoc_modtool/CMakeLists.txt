@@ -5,11 +5,15 @@ include(GrPython)
 GR_PYTHON_INSTALL(FILES
 	    __init__.py
         cmakefile_editor.py
+        code_generator.py
         grc_xml_generator.py #not here
+        modtool_add.py
         modtool_base.py
         modtool_makexml.py
         modtool_newmod.py
         util_functions.py
+        scm.py
+        templates.py
         parser_cc_block.py
         DESTINATION ${GR_PYTHON_DIR}/ettus/rfnoc_modtool
         COMPONENT "utils"

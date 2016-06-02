@@ -27,7 +27,7 @@ description here (python/__init__.py).
 try:
     # this might fail if the module is python-only
     from ettus_swig import *
-    from rfnoc_modtool import *
+#    from rfnoc_modtool import *
 except ImportError:
     pass
 

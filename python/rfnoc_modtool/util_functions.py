@@ -1,13 +1,89 @@
 ###RFNoC Modtool
 
-""" Utility functions for RFNoC Modtool """
+""" Utility functions for gr_modtool """
 
 import re
 import sys
 
+# None of these must depend on other modtool stuff!
+
+def get_command_from_argv(possible_cmds):
+    """ Read the requested command from argv. This can't be done with optparse,
+    since the option parser isn't defined before the command is known, and
+    optparse throws an error."""
+    for arg in sys.argv:
+        if arg[0] != "-" and arg in possible_cmds:
+            return arg
+    return None
+
+def append_re_line_sequence(filename, linepattern, newline):
+    """ Detects the re 'linepattern' in the file. After its last occurrence,
+    paste 'newline'. If the pattern does not exist, append the new line
+    to the file. Then, write. """
+    oldfile = open(filename, 'r').read()
+    lines = re.findall(linepattern, oldfile, flags=re.MULTILINE)
+    if len(lines) == 0:
+        open(filename, 'a').write(newline)
+        return
+    last_line = lines[-1]
+    newfile = oldfile.replace(last_line, last_line + newline + '\n')
+    open(filename, 'w').write(newfile)
+
+def remove_pattern_from_file(filename, pattern):
+    """ Remove all occurrences of a given pattern from a file. """
+    oldfile = open(filename, 'r').read()
+    pattern = re.compile(pattern, re.MULTILINE)
+    open(filename, 'w').write(pattern.sub('', oldfile))
+
+def str_to_fancyc_comment(text):
+    """ Return a string as a C formatted comment. """
+    l_lines = text.splitlines()
+    outstr = "/* " + l_lines[0] + "\n"
+    for line in l_lines[1:]:
+        outstr += " * " + line + "\n"
+    outstr += " */\n"
+    return outstr
+
+def str_to_python_comment(text):
+    """ Return a string as a Python formatted comment. """
+    return re.compile('^', re.MULTILINE).sub('# ', text)
+
+def strip_default_values(string):
+    """ Strip default values from a C++ argument list. """
+    return re.sub(' *=[^,)]*', '', string)
+
+def strip_arg_types(string):
+    """"
+    Strip the argument types from a list of arguments.
+    Example: "int arg1, double arg2" -> "arg1, arg2"
+    Note that some types have qualifiers, which also are part of
+    the type, e.g. "const std::string &name" -> "name", or
+    "const char *str" -> "str".
+    """
+    string = strip_default_values(string)
+    return ", ".join(
+                [part.strip().split(' ')[-1] for part in string.split(',')]
+            ).translate(None, '*&')
+
+def strip_arg_types_grc(string):
+    """" Strip the argument types from a list of arguments for GRC make tag.
+    Example: "int arg1, double arg2" -> "$arg1, $arg2" """
+    if len(string) == 0:
+        return ""
+    else:
+        string = strip_default_values(string)
+        return ", ".join(['$' + part.strip().split(' ')[-1] for part in string.split(',')])
+
 def get_modname():
+    """ Grep the current module's name from gnuradio.project or CMakeLists.txt """
+    modname_trans = {'howto-write-a-block': 'howto'}
+    try:
+        prfile = open('gnuradio.project', 'r').read()
+        regexp = r'projectname\s*=\s*([a-zA-Z0-9-_]+)$'
+        return re.search(regexp, prfile, flags=re.MULTILINE).group(1).strip()
+    except IOError:
+        pass
     # OK, there's no gnuradio.project. So, we need to guess.
-    modname_trans = {'howto-write-a-block': 'rfnoc_example'}
     cmfile = open('CMakeLists.txt', 'r').read()
     regexp = r'(project\s*\(\s*|GR_REGISTER_COMPONENT\(")gr-(?P<modname>[a-zA-Z0-9-_]+)(\s*(CXX)?|" ENABLE)'
     try:
@@ -50,4 +126,3 @@ def ask_yes_no(question, default):
         return default
     else:
         return not default
-
