@@ -82,7 +82,7 @@ namespace gr {
       const int block_select,
       const int device_select,
 #end if
-      ${strip_default_values($arglist)});
+      ${strip_default_values($arglist)}); //this will generate compilation problems for the comma for null arglist. FIXME
       ~${blockname}_impl();
 
       // Where all the action really happens
@@ -109,7 +109,7 @@ namespace gr {
 #end if
     };
 
-  } // namespace ${modname}
+  } // 1namespace ${modname}
 } // namespace gr
 
 \#endif /* INCLUDED_${modname.upper()}_${blockname.upper()}_IMPL_H */
@@ -123,7 +123,7 @@ ${str_to_fancyc_comment($license)}
 \#include "config.h"
 \#endif
 
-#set $rfnoclist = ['const gr::ettus::device3::sptr &dev', 'const ::uhd::stream_args_t &tx_stream_args', 'const ::uhd::stream_args_t &rx_stream_args', 'const int block_select', 'const int device_select']
+#set rfnoclist = 'const gr::ettus::device3::sptr &dev, const ::uhd::stream_args_t &tx_stream_args, const ::uhd::stream_args_t &rx_stream_args, const int block_select, const int device_select'
 
 \#include <gnuradio/io_signature.h>
 #if $blocktype == 'noblock'
@@ -149,13 +149,13 @@ namespace gr {
     ${blockname}::sptr
     ${blockname}::make(
 #if $blocktype == 'rfnoc'
-    ${strip_default_values($rfnoclist)},
+    ${strip_default_values(rfnoclist)},
 #end if
     ${strip_default_values($arglist)})
     {
       return gnuradio::get_initial_sptr
 #if $blocktype == 'rfnoc'
-        (new ${blockname}_impl(${strip_arg_types($rfnoclist)},${strip_arg_types($arglist)}));
+        (new ${blockname}_impl(${strip_arg_types(rfnoclist)},${strip_arg_types($arglist)}));
 #else
         (new ${blockname}_impl(${strip_arg_types($arglist)}));
 #end if
@@ -187,7 +187,7 @@ namespace gr {
      */
 #if $blocktype == 'rfnoc'
     ${blockname}_impl::${blockname}_impl(
-         ${strip_default_values($rfnoclist)}, ${strip_default_values($arglist)}
+         ${strip_default_values(rfnoclist)}, ${strip_default_values($arglist)}
     )
       : gr::${grblocktype}("${blockname}",
         gr::${grblocktype}_impl(
@@ -200,7 +200,7 @@ namespace gr {
       : gr::${grblocktype}("${blockname}",
               gr::io_signature::make($inputsig),
               gr::io_signature::make($outputsig)$decimation)
-#enf if
+#end if
 
 #if $blocktype == 'hier'
     {
@@ -292,7 +292,7 @@ namespace gr {
 #end if
 #end if
 
-  } /* namespace ${modname} */
+  } /* 2namespace ${modname} */
 } /* namespace gr */
 
 '''
@@ -349,14 +349,14 @@ namespace gr {
        * creating new instances.
        */
 #if $blocktype == 'rfnoc'
-      static sptr make($rfnoclist,$arglist);
+      static sptr make(rfnoclist,$arglist);
 #else
       static sptr make($arglist);
 #end if
     };
 #end if
 
-  } // namespace ${modname}
+  } // 3namespace ${modname}
 } // namespace gr
 
 \#endif /* INCLUDED_${modname.upper()}_${blockname.upper()}_H */
@@ -482,7 +482,7 @@ namespace gr {
       // Put test here
     }
 
-  } /* namespace ${modname} */
+  } /* 4namespace ${modname} */
 } /* namespace gr */
 
 '''
@@ -511,7 +511,7 @@ namespace gr {
       void t1();
     };
 
-  } /* namespace ${modname} */
+  } /* 5namespace ${modname} */
 } /* namespace gr */
 
 \#endif /* _QA_${blockname.upper()}_H_ */

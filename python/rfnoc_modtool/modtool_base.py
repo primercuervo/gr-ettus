@@ -84,7 +84,7 @@ class ModTool(object):
             self._skip_subdirs['swig'] = True
         if options.skip_grc or not self._has_subdirs['grc']:
             self._skip_subdirs['grc'] = True
-        self._info['blockname'] = options.blockname
+        self._info['blockname'] = options.block_name
         self._setup_files()
         self._info['yes'] = options.yes
         self.options = options
