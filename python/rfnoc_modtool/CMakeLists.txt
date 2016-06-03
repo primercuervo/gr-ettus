@@ -28,7 +28,8 @@ install(DIRECTORY rfnoc-newmod
 #################################################################
 # Create and install the rfnoc_modtool conf file
 #################################################################
-file(TO_NATIVE_PATH ${CMAKE_INSTALL_PREFIX}/${GR_PKG_RFNOC_MODTOOL_DATA_DIR}/rfnoc-newmod newmoddir)
+file(TO_NATIVE_PATH ${CMAKE_INSTALL_PREFIX}/${GR_PKG_RFNOC_MODTOOL_DATA_DIR}/python/rfnoc-newmod newmoddir)
+#file(TO_NATIVE_PATH ~/src/prefix/src/gr-ettus/python/rfnoc-newmod newmoddir)
 
 configure_file(
 	${CMAKE_CURRENT_SOURCE_DIR}/rfnocmodtool.conf.in

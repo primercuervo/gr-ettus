@@ -76,7 +76,7 @@ def strip_arg_types_grc(string):
 
 def get_modname():
     """ Grep the current module's name from gnuradio.project or CMakeLists.txt """
-    modname_trans = {'howto-write-a-block': 'howto'}
+    modname_trans = {'howto-write-a-block': 'rfnoc_example'}
     try:
         prfile = open('gnuradio.project', 'r').read()
         regexp = r'projectname\s*=\s*([a-zA-Z0-9-_]+)$'

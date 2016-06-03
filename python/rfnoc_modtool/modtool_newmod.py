@@ -8,6 +8,7 @@ import re
 from optparse import OptionGroup
 from gnuradio import gr
 from modtool_base import ModTool, ModToolException ###TODO: add modtool base. Check if there are more classes, why not *?
+from scm import SCMRepoFactory
 
 class ModToolNewModule(ModTool):
     """Create a new out-of-tree module """
@@ -35,10 +36,10 @@ class ModToolNewModule(ModTool):
             else:
                 self._info['modname'] = raw_input('Name of the new module: ')
         if not re.match('[a-zA-Z0-9_]+$', self._info['modname']):
-                raise ModToolException('Invalid module name.')
+            raise ModToolException('Invalid module name.')
         self._dir = options.directory
         if self._dir == '.':
-            self._dir =  './rfnoc-%s' % self._info['modname']
+            self._dir = './rfnoc-%s' % self._info['modname']
         try:
             os.stat(self._dir)
         except OSError:
@@ -46,7 +47,7 @@ class ModToolNewModule(ModTool):
         else:
             raise ModToolException('The given directory exists.')
         if options.srcdir is None:
-            options.srcdir  = '~/src/prefix/src/gr-ettus/rfnoc_modtool/rfnoc-newmod/' ### Hardcoded, use pybombs prefix instead
+            options.srcdir  = '~/src/prefix/src/gr-ettus/python/rfnoc_modtool/rfnoc-newmod/' ### Hardcoded, use pybombs prefix instead
         self._srcdir = gr.prefs().get_string('modtool', 'newmod_path', options.srcdir)
         if not os.path.isdir(self._srcdir):
             raise ModToolException('Could not find rfnoc-newmod source dir')
@@ -77,4 +78,7 @@ class ModToolNewModule(ModTool):
             if os.path.basename(root) == 'rfnoc_example':
                 os.rename(root, os.path.join(os.path.dirname(root), self._info['modname']))
         print "Done."
-        ### SCM not added for vanilla version    
+        if self.scm.init_repo(path_to_repo="."):
+            print "Created repository... you might want to commit before continuing."
+        print "Use 'rfnocmodtool add' to add a new block to this currently empty module."
+

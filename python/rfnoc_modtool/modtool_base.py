@@ -24,10 +24,10 @@ class ModTool(object):
         self._info = {}
         self._file = {}
         for subdir in self._subdirs:
-            self. _has_subdirs[subdir] = False
+            self._has_subdirs[subdir] = False
             self._skip_subdirs[subdir] = False
         self.parser = self.setup_parser()
-        self._dir = None   
+        self._dir = None
 
     def setup_parser(self):
         """ Init the option parser. If derived classes need to add options,
@@ -56,11 +56,11 @@ class ModTool(object):
                 help="Use source control management (yes, no or auto).")
         ogroup.add_option("-y", "--yes", action="store_true", default=False,
                 help="Answer all questions with 'yes'. This can overwrite and delete your files, so be careful.")
-        parser.add_option_group(ogroup) 
+        parser.add_option_group(ogroup)
         return parser
 
     def setup(self, options, args):
-        """ Initialize all internal variables, such as the module name etc. """
+        """ Initialise all internal variables, such as the module name etc. """
         self._dir = options.directory
         if not self._check_directory(self._dir):
             raise ModToolException('No GNU Radio module found in the given directory.')

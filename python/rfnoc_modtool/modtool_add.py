@@ -20,7 +20,7 @@ class ModToolAdd(ModTool):
     name = 'add'
     aliases = ('insert',)
     _block_types = ('sink', 'source', 'sync', 'decimator', 'interpolator',
-                    'general', 'tagged_stream', 'hier', 'noblock')
+                    'general', 'tagged_stream', 'hier', 'noblock', 'rfnoc')
 
     def __init__(self):
         ModTool.__init__(self)
