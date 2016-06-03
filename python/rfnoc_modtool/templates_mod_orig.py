@@ -123,8 +123,6 @@ ${str_to_fancyc_comment($license)}
 \#include "config.h"
 \#endif
 
-#set $rfnoclist = ['const gr::ettus::device3::sptr &dev', 'const ::uhd::stream_args_t &tx_stream_args', 'const ::uhd::stream_args_t &rx_stream_args', 'const int block_select', 'const int device_select']
-
 \#include <gnuradio/io_signature.h>
 #if $blocktype == 'noblock'
 \#include <${include_dir_prefix}/${blockname}.h>
@@ -149,19 +147,21 @@ namespace gr {
     ${blockname}::sptr
     ${blockname}::make(
 #if $blocktype == 'rfnoc'
-    ${strip_default_values($rfnoclist)},
+    const gr::ettus::device3::sptr &dev,
+    const ::uhd::stream_args_t &tx_stream_args,
+    const ::uhd::stream_args_t &rx_stream_args,
+    const int block_select,
+    const int device_select,
 #end if
     ${strip_default_values($arglist)})
     {
       return gnuradio::get_initial_sptr
 #if $blocktype == 'rfnoc'
-        (new ${blockname}_impl(${strip_arg_types($rfnoclist)},${strip_arg_types($arglist)}));
+        (new ${blockname}_impl(dev, tx_stream_args, rx_stream_args,block_select, device_select,${strip_arg_types($arglist)}));
 #else
         (new ${blockname}_impl(${strip_arg_types($arglist)}));
 #end if
     }
-
-
 
 #if $blocktype == 'decimator'
 #set $decimation = ', <+decimation+>'
@@ -185,23 +185,10 @@ namespace gr {
     /*
      * The private constructor
      */
-#if $blocktype == 'rfnoc'
-    ${blockname}_impl::${blockname}_impl(
-         ${strip_default_values($rfnoclist)}, ${strip_default_values($arglist)}
-    )
-      : gr::${grblocktype}("${blockname}",
-        gr::${grblocktype}_impl(
-            dev,
-            gr::${grblocktype}_impl::make_block_id("${blockname}",block_select, device_select),
-            tx_stream_args, rf_stream_args
-            ) //hardcoded
-#else
     ${blockname}_impl::${blockname}_impl(${strip_default_values($arglist)})
       : gr::${grblocktype}("${blockname}",
               gr::io_signature::make($inputsig),
               gr::io_signature::make($outputsig)$decimation)
-#enf if
-
 #if $blocktype == 'hier'
     {
       connect(self(), 0, d_firstblock, 0);
@@ -265,7 +252,7 @@ namespace gr {
       // Tell runtime system how many output items we produced.
       return noutput_items;
     }
-#else if $blocktype == 'hier' or 'rfnoc'
+#else if $blocktype == 'hier'
 #silent pass
 #else
     int
@@ -305,13 +292,8 @@ ${str_to_fancyc_comment($license)}
 \#define INCLUDED_${modname.upper()}_${blockname.upper()}_H
 
 \#include <${include_dir_prefix}/api.h>
-#if $blocktype != 'noblock' or 'rfnoc'
+#if $blocktype != 'noblock'
 \#include <gnuradio/${grblocktype}.h>
-#if $blocktype == 'rfnoc'
-\#include <ettus/device3.h>
-\#include <ettus/rfnoc_block.h>
-\#include <uhd/stream.h>
-#end if
 #end if
 
 namespace gr {
@@ -348,11 +330,7 @@ namespace gr {
        * class. ${modname}::${blockname}::make is the public interface for
        * creating new instances.
        */
-#if $blocktype == 'rfnoc'
-      static sptr make($rfnoclist,$arglist);
-#else
       static sptr make($arglist);
-#end if
     };
 #end if
 
@@ -363,7 +341,7 @@ namespace gr {
 
 '''
 
-# Python block TODO check this
+# Python block
 Templates['block_python'] = '''\#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 ${str_to_python_comment($license)}
@@ -464,7 +442,7 @@ class ${blockname}(${parenttype}):
 
 '''
 
-# C++ file for QA TODO check this
+# C++ file for QA
 Templates['qa_cpp'] = '''/* -*- c++ -*- */
 ${str_to_fancyc_comment($license)}
 
@@ -487,7 +465,7 @@ namespace gr {
 
 '''
 
-# Header file for QA  TODO check this
+# Header file for QA
 Templates['qa_h'] = '''/* -*- c++ -*- */
 ${str_to_fancyc_comment($license)}
 
@@ -518,7 +496,7 @@ namespace gr {
 
 '''
 
-# Python QA code TODO check this
+# Python QA code
 Templates['qa_python'] = '''\#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 ${str_to_python_comment($license)}
@@ -592,9 +570,9 @@ Templates['grc_xml'] = '''<?xml version="1.0"?>
 
 # Usage
 Templates['usage'] = '''
-rfnocmodtool <command> [options] -- Run <command> with the given options.
-rfnocmodtool help -- Show a list of commands.
-rfnocmodtool help <command> -- Shows the help for a given command. '''
+gr_modtool <command> [options] -- Run <command> with the given options.
+gr_modtool help -- Show a list of commands.
+gr_modtool help <command> -- Shows the help for a given command. '''
 
 # SWIG string
 Templates['swig_block_magic'] = """#if $version == '36'

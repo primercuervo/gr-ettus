@@ -20,6 +20,7 @@ class GRMTemplate(Cheetah.Template.Template):
                 'general': 'block',
                 'tagged_stream': 'tagged_stream_block',
                 'hier': 'hier_block2',
+                'rfnoc':'ettus::rfnoc_block',
                 'noblock': ''}
         searchList['str_to_fancyc_comment'] = str_to_fancyc_comment
         searchList['str_to_python_comment'] = str_to_python_comment
