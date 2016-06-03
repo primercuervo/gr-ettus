@@ -305,13 +305,13 @@ ${str_to_fancyc_comment($license)}
 \#define INCLUDED_${modname.upper()}_${blockname.upper()}_H
 
 \#include <${include_dir_prefix}/api.h>
-#if $blocktype != 'noblock' or 'rfnoc'
+#if $blocktype != 'noblock' and $blocktype!='rfnoc'
 \#include <gnuradio/${grblocktype}.h>
+#end if
 #if $blocktype == 'rfnoc'
 \#include <ettus/device3.h>
 \#include <ettus/rfnoc_block.h>
 \#include <uhd/stream.h>
-#end if
 #end if
 
 namespace gr {
