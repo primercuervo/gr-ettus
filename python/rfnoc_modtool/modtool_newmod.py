@@ -47,8 +47,9 @@ class ModToolNewModule(ModTool):
         else:
             raise ModToolException('The given directory exists.')
         if options.srcdir is None:
-            options.srcdir  = '~/src/prefix/src/gr-ettus/python/rfnoc_modtool/rfnoc-newmod/' ### Hardcoded, use pybombs prefix instead
-        self._srcdir = gr.prefs().get_string('modtool', 'newmod_path', options.srcdir)
+            #it is not accepting the ~ as value for home, TODO automate this path for pybombs/usr/lib from source  ~/src/prefix/src/gr-ettus/python/rfnoc_modtool/rfnoc-newmod/' ### Hardcoded, use pybombs prefix instead
+            options.srcdir  = '/home/cuervo/src/prefix/src/gr-ettus/python/rfnoc_modtool/rfnoc-newmod' ### Hardcoded, use pybombs prefix instead
+        self._srcdir = gr.prefs().get_string('rfnocmodtool', 'newmod_path', options.srcdir)
         if not os.path.isdir(self._srcdir):
             raise ModToolException('Could not find rfnoc-newmod source dir')
         self.options = options
