@@ -50,8 +50,11 @@ def str_to_python_comment(text):
 
 def strip_default_values(string):
     """ Strip default values from a C++ argument list. """
-    print re.sub(' *=[^,)]*', '', string)
-    return re.sub(' *=[^,)]*', '', string)
+    return re.sub(' *=[^,)]*','' , string)
+
+def strip_listed_values(string):
+    """ Strip default values from a C++ argument list and, if printed, returns the list in multiple lines """
+    return re.sub(' *,' ,' ,\n' , string)
 
 def strip_arg_types(string):
     """"

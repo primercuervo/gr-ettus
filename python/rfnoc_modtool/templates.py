@@ -6,6 +6,7 @@ from datetime import datetime
 
 Templates = {}
 
+
 # Default licence
 Templates['defaultlicense'] = '''
 Copyright %d ${copyrightholder}.
@@ -76,13 +77,14 @@ namespace gr {
      public:
       ${blockname}_impl(
 #if $blocktype == 'rfnoc'
-      const gr::ettus::device3::sptr &dev,
-      const ::uhd::stream_args_t &tx_stream_args,
-      const ::uhd::stream_args_t &rx_stream_args,
-      const int block_select,
-      const int device_select,
+#if $arglist:
+     ${strip_listed_values($rfnoclist)},${strip_default_values($arglist)});
+#else
+     ${strip_listed_values($rfnoclist)});
 #end if
-      ${strip_default_values($arglist)}); //this will generate compilation problems for the comma for null arglist. FIXME
+#else
+      ${strip_default_values($arglist)});
+#end if
       ~${blockname}_impl();
 
       // Where all the action really happens
@@ -100,7 +102,7 @@ namespace gr {
            gr_vector_void_star &output_items);
 #else if $blocktype == 'hier'
 #silent pass
-##else if $blocktype == 'rfnoc'
+#else if $blocktype == 'rfnoc'
 #silent pass
 #else
       int work(int noutput_items,
@@ -122,8 +124,6 @@ ${str_to_fancyc_comment($license)}
 \#ifdef HAVE_CONFIG_H
 \#include "config.h"
 \#endif
-
-#set rfnoclist = 'const gr::ettus::device3::sptr &dev, const ::uhd::stream_args_t &tx_stream_args, const ::uhd::stream_args_t &rx_stream_args, const int block_select, const int device_select'
 
 \#include <gnuradio/io_signature.h>
 #if $blocktype == 'noblock'
@@ -148,20 +148,29 @@ namespace gr {
 #else
     ${blockname}::sptr
     ${blockname}::make(
+
 #if $blocktype == 'rfnoc'
-    ${strip_default_values(rfnoclist)},
+#if $arglist:
+     ${strip_listed_values($rfnoclist)},${strip_default_values($arglist)}) 
+#else
+     ${strip_listed_values($rfnoclist)})
 #end if
-    ${strip_default_values($arglist)})
+#else
+      ${strip_default_values($arglist)})
+#end if
     {
       return gnuradio::get_initial_sptr
+
 #if $blocktype == 'rfnoc'
-        (new ${blockname}_impl(${strip_arg_types(rfnoclist)},${strip_arg_types($arglist)}));
+#if $arglist:
+        (new ${blockname}_impl(${strip_arg_types($rfnoclist)},${strip_arg_types($arglist)}));
+#else
+        (new ${blockname}_impl(${strip_arg_types($rfnoclist)}));
+#end if
 #else
         (new ${blockname}_impl(${strip_arg_types($arglist)}));
 #end if
     }
-
-
 
 #if $blocktype == 'decimator'
 #set $decimation = ', <+decimation+>'
@@ -187,14 +196,14 @@ namespace gr {
      */
 #if $blocktype == 'rfnoc'
     ${blockname}_impl::${blockname}_impl(
-         ${strip_default_values(rfnoclist)}, ${strip_default_values($arglist)}
+         ${strip_listed_values($rfnoclist)}, ${strip_default_values($arglist)}
     )
       : gr::${grblocktype}("${blockname}",
         gr::${grblocktype}_impl(
             dev,
             gr::${grblocktype}_impl::make_block_id("${blockname}",block_select, device_select),
             tx_stream_args, rf_stream_args
-            ) //hardcoded
+            ) 
 #else
     ${blockname}_impl::${blockname}_impl(${strip_default_values($arglist)})
       : gr::${grblocktype}("${blockname}",
@@ -349,7 +358,11 @@ namespace gr {
        * creating new instances.
        */
 #if $blocktype == 'rfnoc'
-      static sptr make(rfnoclist,$arglist);
+#if $arglist
+      static sptr make(${strip_listed_values($rfnoclist)},$arglist);
+#else
+      static sptr make($rfnoclist);
+#end if
 #else
       static sptr make($arglist);
 #end if

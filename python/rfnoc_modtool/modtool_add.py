@@ -54,6 +54,8 @@ class ModToolAdd(ModTool):
     def setup(self, options, args):
         ModTool.setup(self, options, args)
 
+        self._info['rfnoclist'] = 'const gr::ettus::device3::sptr &dev, const ::uhd::stream_args_t &tx_stream_args, const ::uhd::stream_args_t &rx_stream_args, const int block_select, const int device_select'
+
         self._info['blocktype'] = options.block_type
         if self._info['blocktype'] is None:
             # Print list out of blocktypes to user for reference
@@ -214,7 +216,7 @@ class ModToolAdd(ModTool):
             fname_h  = self._info['blockname'] + '.h'
             fname_cc = self._info['blockname'] + '.cc'
             if self._info['blocktype'] in ('source', 'sink', 'sync', 'decimator',
-                                           'interpolator', 'general', 'hier', 'tagged_stream'):
+                                           'interpolator', 'general', 'hier', 'tagged_stream', 'rfnoc'):
                 fname_cc = self._info['blockname'] + '_impl.cc'
                 self._write_tpl('block_impl_h',   'lib', self._info['blockname'] + '_impl.h')
             self._write_tpl('block_impl_cpp', 'lib', fname_cc)
