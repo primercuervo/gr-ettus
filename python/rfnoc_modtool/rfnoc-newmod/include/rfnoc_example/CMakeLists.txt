@@ -22,8 +22,5 @@
 ########################################################################
 install(FILES
     api.h
-    #copy.h
-    rfnoc_copy.h 
-    copy_block_ctrl.hpp
     DESTINATION include/rfnoc_example
 )

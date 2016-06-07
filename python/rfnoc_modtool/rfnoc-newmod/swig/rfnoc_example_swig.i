@@ -14,10 +14,6 @@
 
 %{
 #include "ettus/device3.h"
-#include "rfnoc_example/rfnoc_copy.h"
 #include "ettus/rfnoc_block_impl.h"
 %}
-//
-%include "rfnoc_example/rfnoc_copy.h"
-GR_SWIG_BLOCK_MAGIC2(rfnoc_example, rfnoc_copy);
 

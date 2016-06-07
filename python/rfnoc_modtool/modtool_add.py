@@ -54,8 +54,6 @@ class ModToolAdd(ModTool):
     def setup(self, options, args):
         ModTool.setup(self, options, args)
 
-        self._info['rfnoclist'] = 'const gr::ettus::device3::sptr &dev, const ::uhd::stream_args_t &tx_stream_args, const ::uhd::stream_args_t &rx_stream_args, const int block_select, const int device_select'
-
         self._info['blocktype'] = options.block_type
         if self._info['blocktype'] is None:
             # Print list out of blocktypes to user for reference
@@ -160,6 +158,8 @@ class ModToolAdd(ModTool):
             self._run_python_qa()
         if has_grc and not self._skip_subdirs['grc']:
             self._run_grc()
+        if self._info['blocktype'] in ('rfnoc'):
+            self._run_rfnoc()
 
     def _run_lib(self):
         """ Do everything that needs doing in the subdir 'lib' and 'include'.
@@ -221,6 +221,12 @@ class ModToolAdd(ModTool):
                 self._write_tpl('block_impl_h',   'lib', self._info['blockname'] + '_impl.h')
             self._write_tpl('block_impl_cpp', 'lib', fname_cc)
             self._write_tpl('block_def_h',    self._info['includedir'], fname_h)
+            #RFNoC block Controllers
+            if self._info['blocktype'] in ('rfnoc'):
+                fname_ctrl_cpp = self._info['blockname'] + '_block_ctrl_impl.cpp'
+                fname_ctrl_hpp = self._info['blockname'] + '_block_ctrl.hpp'
+                self._write_tpl('block_ctrl_hpp',    self._info['includedir'], fname_ctrl_hpp)
+                self._write_tpl('block_ctrl_cpp', 'lib', fname_ctrl_cpp)
         else: # Pre-3.7 or autotools
             fname_h  = self._info['fullblockname'] + '.h'
             fname_cc = self._info['fullblockname'] + '.cc'
@@ -238,9 +244,13 @@ class ModToolAdd(ModTool):
             cmake_list_var = '[a-z]*_?' + self._info['modname'] + '_sources'
             if not ed.append_value('list', fname_cc, to_ignore_start='APPEND ' + cmake_list_var):
                 ed.append_value('add_library', fname_cc)
+            if self._info['blocktype'] in ('rfnoc'):
+                ed.append_value('list', fname_ctrl_cpp, to_ignore_start='APPEND ' + cmake_list_var)
             ed.write()
             ed = CMakeFileEditor(self._file['cminclude'])
             ed.append_value('install', fname_h, to_ignore_end='DESTINATION[^()]+')
+            if self._info['blocktype'] in ('rfnoc'):
+                ed.append_value('install', fname_ctrl_hpp, to_ignore_end='DESTINATION[^()]+')
             ed.write()
             self.scm.mark_files_updated((self._file['cminclude'], self._file['cmlib']))
 
@@ -324,6 +334,20 @@ class ModToolAdd(ModTool):
         ed.write()
         self.scm.mark_files_updated((self._file['cmgrc'],))
 
-
+    def _run_rfnoc(self):
+        """ Do everything that needs doing in the subdir 'rfnoc' to add
+        a GRC block control bindings XML file.
+        - add .xml file
+        - include in CMakeLists.txt
+        """
+        fname_rfnoc = self._info['blockname'] + '.xml'
+        self._write_tpl('rfnoc_xml', 'rfnoc/blocks', fname_rfnoc)
+        ed = CMakeFileEditor(self._file['cmrfnoc'], '\n    ')
+        if self._skip_cmakefiles or ed.check_for_glob('*.xml'):
+            return
+        print "Editing rfnoc/blocks/CMakeLists.txt..."
+        ed.append_value('install', fname_rfnoc, to_ignore_end='DESTINATION[^()]+')
+        ed.write()
+        self.scm.mark_files_updated((self._file['cmrfnoc'],))
 
 

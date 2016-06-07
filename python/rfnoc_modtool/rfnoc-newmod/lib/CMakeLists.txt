@@ -26,9 +26,6 @@ include_directories(${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIRS})
 
 list(APPEND rfnoc_example_sources
-    #copy_impl.cc
-    rfnoc_copy_impl.cc
-    copy_block_ctrl.cpp
 )
 
 

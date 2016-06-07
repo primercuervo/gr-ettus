@@ -51,6 +51,8 @@ class ModTool(object):
                 help="Don't do anything in the python/ subdirectory.")
         ogroup.add_option("--skip-grc", action="store_true", default=False,
                 help="Don't do anything in the grc/ subdirectory.")
+        ogroup.add_option("--skip-rfnoc", action="store_true", default=False,
+                help="Don't do anything in the rfnoc/ subdirectory.")
         ogroup.add_option("--scm-mode", type="choice", choices=('yes', 'no', 'auto'),
                 default=gr.prefs().get_string('rfnocmodtool', 'scm_mode', 'no'),
                 help="Use source control management (yes, no or auto).")
@@ -84,6 +86,7 @@ class ModTool(object):
             self._skip_subdirs['swig'] = True
         if options.skip_grc or not self._has_subdirs['grc']:
             self._skip_subdirs['grc'] = True
+            ###TODO: add skip for rfnoc?
         self._info['blockname'] = options.block_name
         self._setup_files()
         self._info['yes'] = options.yes
@@ -101,6 +104,7 @@ class ModTool(object):
         self._file['pyinit']   = os.path.join(self._info['pydir'], '__init__.py')
         self._file['cmlib']    = os.path.join('lib',    'CMakeLists.txt')
         self._file['cmgrc']    = os.path.join('grc',    'CMakeLists.txt')
+        self._file['cmrfnoc']    = os.path.join('rfnoc','blocks',  'CMakeLists.txt')
         self._file['cmpython'] = os.path.join(self._info['pydir'], 'CMakeLists.txt')
         if self._info['is_component']:
             self._info['includedir'] = os.path.join('include', 'gnuradio', self._info['modname'])

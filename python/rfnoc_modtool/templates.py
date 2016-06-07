@@ -78,13 +78,15 @@ namespace gr {
       ${blockname}_impl(
 #if $blocktype == 'rfnoc'
 #if $arglist:
-     ${strip_listed_values($rfnoclist)},${strip_default_values($arglist)});
-#else
-     ${strip_listed_values($rfnoclist)});
+        ${strip_default_values($arglist)},
 #end if
+        const gr::ettus::device3::sptr &dev,
+        const int block_select,
+        const int device_select
 #else
-      ${strip_default_values($arglist)});
+        ${strip_default_values($arglist)}
 #end if
+      );
       ~${blockname}_impl();
 
       // Where all the action really happens
@@ -111,7 +113,7 @@ namespace gr {
 #end if
     };
 
-  } // 1namespace ${modname}
+  } // namespace ${modname}
 } // namespace gr
 
 \#endif /* INCLUDED_${modname.upper()}_${blockname.upper()}_IMPL_H */
@@ -148,28 +150,32 @@ namespace gr {
 #else
     ${blockname}::sptr
     ${blockname}::make(
-
 #if $blocktype == 'rfnoc'
 #if $arglist:
-     ${strip_listed_values($rfnoclist)},${strip_default_values($arglist)}) 
-#else
-     ${strip_listed_values($rfnoclist)})
+        ${strip_default_values($arglist)},
 #end if
+        const gr::ettus::device3::sptr &dev,
+        const int block_select,
+        const int device_select
 #else
-      ${strip_default_values($arglist)})
+      ${strip_default_values($arglist)}
 #end if
+    )
     {
-      return gnuradio::get_initial_sptr
-
+      return gnuradio::get_initial_sptr(
+        new ${blockname}_impl(
 #if $blocktype == 'rfnoc'
 #if $arglist:
-        (new ${blockname}_impl(${strip_arg_types($rfnoclist)},${strip_arg_types($arglist)}));
-#else
-        (new ${blockname}_impl(${strip_arg_types($rfnoclist)}));
+            ${strip_arg_types($arglist)},
 #end if
+            dev,
+            block_select,
+            device_select
 #else
-        (new ${blockname}_impl(${strip_arg_types($arglist)}));
+            ${strip_arg_types($arglist)}
 #end if
+        )
+      );
     }
 
 #if $blocktype == 'decimator'
@@ -194,16 +200,24 @@ namespace gr {
     /*
      * The private constructor
      */
-#if $blocktype == 'rfnoc'
     ${blockname}_impl::${blockname}_impl(
-         ${strip_listed_values($rfnoclist)}, ${strip_default_values($arglist)}
+#if $blocktype == 'rfnoc'
+#if $arglist
+         ${strip_default_values($arglist)},
+#end if
+         const gr::ettus::device3::sptr &dev,
+         const int block_select,
+         const int device_select
+#else
+         ${strip_default_values($arglist)}
+#end if
     )
-      : gr::${grblocktype}("${blockname}",
+#if $blocktype == 'rfnoc'
+      : gr::${grblocktype}("${blockname}"),
         gr::${grblocktype}_impl(
             dev,
-            gr::${grblocktype}_impl::make_block_id("${blockname}",block_select, device_select),
-            tx_stream_args, rf_stream_args
-            ) 
+            gr::${grblocktype}_impl::make_block_id("${blockname}",block_select, device_select)
+            )
 #else
     ${blockname}_impl::${blockname}_impl(${strip_default_values($arglist)})
       : gr::${grblocktype}("${blockname}",
@@ -274,7 +288,9 @@ namespace gr {
       // Tell runtime system how many output items we produced.
       return noutput_items;
     }
-#else if $blocktype == 'hier' or 'rfnoc'
+#else if $blocktype == 'hier'
+#silent pass
+#else if $blocktype == 'rfnoc'
 #silent pass
 #else
     int
@@ -301,7 +317,7 @@ namespace gr {
 #end if
 #end if
 
-  } /* 2namespace ${modname} */
+  } /* namespace ${modname} */
 } /* namespace gr */
 
 '''
@@ -357,24 +373,82 @@ namespace gr {
        * class. ${modname}::${blockname}::make is the public interface for
        * creating new instances.
        */
+      static sptr make(
 #if $blocktype == 'rfnoc'
 #if $arglist
-      static sptr make(${strip_listed_values($rfnoclist)},$arglist);
-#else
-      static sptr make($rfnoclist);
+        $arglist,
 #end if
+        const gr::ettus::device3::sptr &dev,
+        const int block_select=-1,
+        const int device_select=-1
 #else
-      static sptr make($arglist);
+         $arglist
 #end if
+        );
     };
 #end if
-
-  } // 3namespace ${modname}
+  } // namespace ${modname}
 } // namespace gr
 
 \#endif /* INCLUDED_${modname.upper()}_${blockname.upper()}_H */
 
 '''
+# Header for RFNoC Block Controller (UHD Host-part)
+Templates['block_ctrl_hpp'] = '''/* -*- c++ -*- */
+${str_to_fancyc_comment($license)}
+
+\#ifndef INCLUDED_LIBUHD_RFNOC_${modname.upper()}_${blockname.upper()}_HPP
+\#define INCLUDED_LIBUHD_RFNOC_${modname.upper()}_${blockname.upper()}_HPP
+
+\#include <uhd/rfnoc/source_block_ctrl_base.hpp>
+\#include <uhd/rfnoc/sink_block_ctrl_base.hpp>
+
+namespace uhd {
+    namespace rfnoc {
+
+/*! \\brief Block controller for the standard copy RFNoC block.
+ *
+ */
+class UHD_API ${blockname}_block_ctrl : public source_block_ctrl_base, public sink_block_ctrl_base
+{
+public:
+    UHD_RFNOC_BLOCK_OBJECT(${blockname}_block_ctrl)
+    
+    /*!
+     * Your block configuration here
+    */
+}; /* class ${blockname}_block_ctrl*/
+
+}} /* namespace uhd::rfnoc */
+
+#endif /* INCLUDED_LIBUHD_RFNOC_${modname.upper()}_${blockname.upper()}_BLOCK_CTRL_HPP */
+'''
+
+# RFNoC Block Controller (UHD Host-part)
+Templates['block_ctrl_cpp'] = '''/* -*- c++ -*- */
+${str_to_fancyc_comment($license)}
+
+\#include <${include_dir_prefix}/${blockname}_block_ctrl.hpp>
+\#include <uhd/convert.hpp>
+\#include <uhd/utils/msg.hpp>
+
+using namespace uhd::rfnoc;
+
+class ${blockname}_block_ctrl_impl : public ${blockname}_block_ctrl
+{
+public:
+
+    UHD_RFNOC_BLOCK_CONSTRUCTOR(${blockname}_block_ctrl)
+    {
+
+    }
+private:
+
+};
+
+UHD_RFNOC_BLOCK_REGISTER(${blockname}_block_ctrl,"${blockname}"); 
+'''
+
 
 # Python block TODO check this
 Templates['block_python'] = '''\#!/usr/bin/env python
@@ -495,7 +569,7 @@ namespace gr {
       // Put test here
     }
 
-  } /* 4namespace ${modname} */
+  } /* namespace ${modname} */
 } /* namespace gr */
 
 '''
@@ -524,7 +598,7 @@ namespace gr {
       void t1();
     };
 
-  } /* 5namespace ${modname} */
+  } /* namespace ${modname} */
 } /* namespace gr */
 
 \#endif /* _QA_${blockname.upper()}_H_ */
@@ -565,16 +639,68 @@ if __name__ == '__main__':
 
 Templates['grc_xml'] = '''<?xml version="1.0"?>
 <block>
+#if $blocktype == 'rfnoc'
+  <name>RFNoC: $blockname</name>
+#else
   <name>$blockname</name>
+#end if
   <key>${modname}_$blockname</key>
   <category>$modname</category>
   <import>import $modname</import>
-  <make>${modname}.${blockname}(${strip_arg_types_grc($arglist)})</make>
+  <make>${modname}.${blockname}(
+#if $blocktype == 'rfnoc'
+#if $arglist
+          ${strip_arg_types_grc($arglist)},
+#end if
+          self.device3,
+          \$block_index,
+          \$device_index
+#else
+          ${strip_arg_types_grc($arglist)}
+#end if
+  )</make>
   <!-- Make one 'param' node for every Parameter you want settable from the GUI.
        Sub-nodes:
        * name
        * key (makes the value accessible as \$keyname, e.g. in the make node)
        * type -->
+
+
+#if $blocktype == 'rfnoc'
+  <!--RFNoC basic block configuration -->
+  <param>
+    <name>Device Select</name>
+    <key>device_index</key>
+    <value>-1</value>
+    <type>int</type>
+    <hide>\#if int(\$device_index()) &lt; 0 then 'part' else 'none'\#</hide>
+    <tab>RFNoC Config</tab>
+  </param>
+
+  <param>
+    <name>COPY Select</name>
+    <key>block_index</key>
+    <value>-1</value>
+    <type>int</type>
+    <hide>\#if int(\$block_index()) &lt; 0 then 'part' else 'none'\#</hide>
+    <tab>RFNoC Config</tab>
+  </param>
+
+  <param>
+    <name>Device3</name>
+    <key>device3</key>
+    <value>variable_uhd_device3_0</value>
+    <type>string</type>
+    <hide>
+      \#if \$dev_addr()
+      none
+      \#else
+      part
+      \#end if
+    </hide>
+    <tab>RFNoC Config</tab>
+  </param>
+#end if
   <param>
     <name>...</name>
     <key>...</key>
@@ -603,6 +729,26 @@ Templates['grc_xml'] = '''<?xml version="1.0"?>
 </block>
 '''
 
+# Block Controller xml at rfnoc/
+Templates['rfnoc_xml'] = '''<?xml version="1.0"?>
+<!--Default XML file-->
+<nocblock>
+  <name>${blockname}</name>
+  <blockname>${blockname}</blockname>
+  <ids>
+    <id revision="0">FFFFFFFFFFFFFFFF</id>
+  </ids>
+  <!--One input, one output. If this is used, better have all the info the C++ file.-->
+  <ports>
+    <sink>
+      <name>in</name>
+    </sink>
+    <source>
+      <name>out</name>
+    </source>
+  </ports>
+</nocblock>
+'''
 # Usage
 Templates['usage'] = '''
 rfnocmodtool <command> [options] -- Run <command> with the given options.

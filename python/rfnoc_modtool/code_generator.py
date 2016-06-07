@@ -5,7 +5,6 @@ import Cheetah.Template
 from util_functions import str_to_fancyc_comment
 from util_functions import str_to_python_comment
 from util_functions import strip_default_values
-from util_functions import strip_listed_values
 from util_functions import strip_arg_types
 from util_functions import strip_arg_types_grc
 
@@ -26,7 +25,6 @@ class GRMTemplate(Cheetah.Template.Template):
         searchList['str_to_fancyc_comment'] = str_to_fancyc_comment
         searchList['str_to_python_comment'] = str_to_python_comment
         searchList['strip_default_values'] = strip_default_values
-        searchList['strip_listed_values'] = strip_default_values
         searchList['strip_arg_types'] = strip_arg_types
         searchList['strip_arg_types_grc'] = strip_arg_types_grc
         Cheetah.Template.Template.__init__(self, src, searchList=searchList)
