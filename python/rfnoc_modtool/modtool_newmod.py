@@ -7,7 +7,7 @@ import os
 import re
 from optparse import OptionGroup
 from gnuradio import gr
-from modtool_base import ModTool, ModToolException ###TODO: add modtool base. Check if there are more classes, why not *?
+from modtool_base import ModTool, ModToolException
 from scm import SCMRepoFactory
 
 class ModToolNewModule(ModTool):
@@ -28,7 +28,7 @@ class ModToolNewModule(ModTool):
         return parser
 
     def setup(self, options, args):
-        #COPYING: don't call ModTool.setup(), that assumes an existing module. \\\\\ Check where there is this assumption.
+        # Don't call ModTool.setup(), that assumes an existing module.
         self._info['modname'] = options.module_name
         if self._info['modname'] is None:
             if len(args) >= 2:

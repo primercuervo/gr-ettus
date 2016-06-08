@@ -55,7 +55,9 @@ ${str_to_fancyc_comment($license)}
 \#define INCLUDED_${modname.upper()}_${blockname.upper()}_IMPL_H
 
 \#include <${include_dir_prefix}/${blockname}.h>
+#if $blocktype == 'rfnoc'
 \#include <ettus/rfnoc_block_impl.h>
+#end if
 
 namespace gr {
   namespace ${modname} {
