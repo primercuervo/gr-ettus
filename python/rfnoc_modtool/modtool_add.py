@@ -339,9 +339,16 @@ class ModToolAdd(ModTool):
         a GRC block control bindings XML file.
         - add .xml file
         - include in CMakeLists.txt
+        - add verilog file
         """
         fname_rfnoc = self._info['blockname'] + '.xml'
+        fname_rfnocv = 'noc_block_' +  self._info['blockname'] + '.v'
         self._write_tpl('rfnoc_xml', 'rfnoc/blocks', fname_rfnoc)
+        self._write_tpl('rfnoc_v', 'rfnoc/fpga-src', fname_rfnocv)
+        patt_v = re.escape('RFNOC_SRCS = $(abspath $(addprefix $(BASE_DIR)/../lib/rfnoc/, \\\n')
+        append_re_line_sequence(self._file['rfnoc_mksrc'],
+                                           patt_v,
+                                           'noc_block_' + self._info['blockname'] + '.v \\')
         ed = CMakeFileEditor(self._file['cmrfnoc'], '\n    ')
         if self._skip_cmakefiles or ed.check_for_glob('*.xml'):
             return

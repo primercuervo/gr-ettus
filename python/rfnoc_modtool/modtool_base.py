@@ -93,7 +93,7 @@ class ModTool(object):
         self.options = options
         self._setup_scm()
 
-    def _setup_files(self): ###Somewhere here add the rfnoc folder, when the cmakelist is already set up
+    def _setup_files(self):
         """ Initialise the self._file[] dictionary """
         if not self._skip_subdirs['swig']:
             self._file['swig'] = os.path.join('swig', self._get_mainswigfile())
@@ -105,6 +105,7 @@ class ModTool(object):
         self._file['cmlib']    = os.path.join('lib',    'CMakeLists.txt')
         self._file['cmgrc']    = os.path.join('grc',    'CMakeLists.txt')
         self._file['cmrfnoc']    = os.path.join('rfnoc','blocks',  'CMakeLists.txt')
+        self._file['rfnoc_mksrc']    = os.path.join('rfnoc','fpga-src',  'Makefile.srcs')
         self._file['cmpython'] = os.path.join(self._info['pydir'], 'CMakeLists.txt')
         if self._info['is_component']:
             self._info['includedir'] = os.path.join('include', 'gnuradio', self._info['modname'])
@@ -165,6 +166,7 @@ class ModTool(object):
             if os.path.isfile(os.path.join(self._dir, 'swig', fname)):
                 return fname
         return None
+
 
     def run(self):
         """ Override this. """
