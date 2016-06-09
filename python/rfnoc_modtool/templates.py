@@ -83,6 +83,8 @@ namespace gr {
         ${strip_default_values($arglist)},
 #end if
         const gr::ettus::device3::sptr &dev,
+        const ::uhd::stream_args_t &tx_stream_args,
+        const ::uhd::stream_args_t &rx_stream_args,
         const int block_select,
         const int device_select
 #else
@@ -157,6 +159,8 @@ namespace gr {
         ${strip_default_values($arglist)},
 #end if
         const gr::ettus::device3::sptr &dev,
+        const ::uhd::stream_args_t &tx_stream_args,
+        const ::uhd::stream_args_t &rx_stream_args,
         const int block_select,
         const int device_select
 #else
@@ -171,6 +175,8 @@ namespace gr {
             ${strip_arg_types($arglist)},
 #end if
             dev,
+            tx_stream_args,
+            rx_stream_args,
             block_select,
             device_select
 #else
@@ -208,6 +214,8 @@ namespace gr {
          ${strip_default_values($arglist)},
 #end if
          const gr::ettus::device3::sptr &dev,
+         const ::uhd::stream_args_t &tx_stream_args,
+         const ::uhd::stream_args_t &rx_stream_args,
          const int block_select,
          const int device_select
 #else
@@ -218,7 +226,8 @@ namespace gr {
       : gr::${grblocktype}("${blockname}"),
         gr::${grblocktype}_impl(
             dev,
-            gr::${grblocktype}_impl::make_block_id("${blockname}",block_select, device_select)
+            gr::${grblocktype}_impl::make_block_id("${blockname}",  block_select, device_select),
+            tx_stream_args, rx_stream_args
             )
 #else
     ${blockname}_impl::${blockname}_impl(${strip_default_values($arglist)})
@@ -338,7 +347,7 @@ ${str_to_fancyc_comment($license)}
 #if $blocktype == 'rfnoc'
 \#include <ettus/device3.h>
 \#include <ettus/rfnoc_block.h>
-\#include <uhd/stream.h>
+\#include <uhd/stream.hpp>
 #end if
 
 namespace gr {
@@ -381,6 +390,8 @@ namespace gr {
         $arglist,
 #end if
         const gr::ettus::device3::sptr &dev,
+        const ::uhd::stream_args_t &tx_stream_args,
+        const ::uhd::stream_args_t &rx_stream_args,
         const int block_select=-1,
         const int device_select=-1
 #else
