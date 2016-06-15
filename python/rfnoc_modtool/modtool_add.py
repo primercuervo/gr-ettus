@@ -36,6 +36,8 @@ class ModToolAdd(ModTool):
                 choices=self._block_types, default=None, help="One of %s." % ', '.join(self._block_types))
         ogroup.add_option("--license-file", type="string", default=None,
                 help="File containing the license header for every source code file.")
+        ogroup.add_option("--noc_id", type="string", default=None,
+                help="The ID number with which the RFNoC block will identify itself at the SW/Hw interface")
         ogroup.add_option("--copyright", type="string", default=None,
                 help="Name of the copyright holder (you or your company) MUST be a quoted string.")
         ogroup.add_option("--argument-list", type="string", default=None,
@@ -112,6 +114,12 @@ class ModToolAdd(ModTool):
             print "Warning: Autotools modules are not supported. ",
             print "Files will be created, but Makefiles will not be edited."
             self._skip_cmakefiles = True
+        #NOC ID parse
+        self._info['noc_id'] = options.noc_id
+        if self._info['noc_id'] is None:
+            self._info['noc_id'] = raw_input("Block NoC ID (Hexadecimal): ")
+        if not re.match('\A[0-9A-F]+\Z', self._info['noc_id']):
+            raise ModToolException('Invalid NoC ID - Only Hexadecimal Values accepted.')
 
     def setup_choose_license(self):
         """ Select a license by the following rules, in this order:
@@ -345,7 +353,7 @@ class ModToolAdd(ModTool):
         fname_rfnocv = 'noc_block_' +  self._info['blockname'] + '.v'
         self._write_tpl('rfnoc_xml', 'rfnoc/blocks', fname_rfnoc)
         self._write_tpl('rfnoc_v', 'rfnoc/fpga-src', fname_rfnocv)
-        patt_v = re.escape('RFNOC_SRCS = $(abspath $(addprefix $(BASE_DIR)/../lib/rfnoc/, \\\n')
+        patt_v = re.escape('RFNOC_SRCS = $(abspath $(addprefix $(BASE_DIR)/../lib/rfnoc/, \\\n') #TODO can be replaced with a dummy, as the file is supposed to be empty
         append_re_line_sequence(self._file['rfnoc_mksrc'],
                                            patt_v,
                                            'noc_block_' + self._info['blockname'] + '.v \\')

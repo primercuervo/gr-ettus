@@ -749,7 +749,7 @@ Templates['rfnoc_xml'] = '''<?xml version="1.0"?>
   <name>${blockname}</name>
   <blockname>${blockname}</blockname>
   <ids>
-    <id revision="0">FFFFFFFFFFFFFFFF</id>
+    <id revision="0">${noc_id}</id>
   </ids>
   <!--One input, one output. If this is used, better have all the info the C++ file.-->
   <ports>
@@ -771,7 +771,7 @@ Templates['rfnoc_v'] = '''
 //
 
 module noc_block_$blockname \#(
-  parameter NOC_ID = 64'h2626_0000_0000_0000, //REMEMBER TO MODIFY ACCORDINGLY YOUR BLOCK_ID
+  parameter NOC_ID = 64'h${noc_id}_0000_0000_0000, //REMEMBER TO MODIFY ACCORDINGLY YOUR BLOCK_ID
   parameter STR_SINK_FIFOSIZE = 11)
 (
   input bus_clk, input bus_rst,
