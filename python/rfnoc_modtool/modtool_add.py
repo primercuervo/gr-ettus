@@ -32,8 +32,6 @@ class ModToolAdd(ModTool):
     def setup_parser(self):
         parser = ModTool.setup_parser(self)
         ogroup = OptionGroup(parser, "Add module options")
-        ogroup.add_option("-t", "--block-type", type="choice",
-                choices=self._block_types, default=None, help="One of %s." % ', '.join(self._block_types))
         ogroup.add_option("--license-file", type="string", default=None,
                 help="File containing the license header for every source code file.")
         ogroup.add_option("--noc_id", type="string", default=None,
@@ -55,15 +53,7 @@ class ModToolAdd(ModTool):
 
     def setup(self, options, args):
         ModTool.setup(self, options, args)
-
-        self._info['blocktype'] = options.block_type
-        if self._info['blocktype'] is None:
-            # Print list out of blocktypes to user for reference
-            print str(self._block_types)
-            while self._info['blocktype'] not in self._block_types:
-                self._info['blocktype'] = raw_input("Enter block type: ")
-                if self._info['blocktype'] not in self._block_types:
-                    print 'Must be one of ' + str(self._block_types)
+        self._info['blocktype'] = 'rfnoc' 
         # Allow user to specify language interactively if not set
         self._info['lang'] = options.lang
         if self._info['lang'] is None:
@@ -348,6 +338,7 @@ class ModToolAdd(ModTool):
         - add .xml file
         - include in CMakeLists.txt
         - add verilog file
+        - adds verilog name to Makefile.srcs
         """
         fname_rfnoc = self._info['blockname'] + '.xml'
         fname_rfnocv = 'noc_block_' +  self._info['blockname'] + '.v'
@@ -356,7 +347,7 @@ class ModToolAdd(ModTool):
         patt_v = re.escape('RFNOC_SRCS = $(abspath $(addprefix $(BASE_DIR)/../lib/rfnoc/, \\\n') #TODO can be replaced with a dummy, as the file is supposed to be empty
         append_re_line_sequence(self._file['rfnoc_mksrc'],
                                            patt_v,
-                                           'noc_block_' + self._info['blockname'] + '.v \\')
+                                           'noc_block_' + self._info['blockname'] + '.v \\\n')
         ed = CMakeFileEditor(self._file['cmrfnoc'], '\n    ')
         if self._skip_cmakefiles or ed.check_for_glob('*.xml'):
             return

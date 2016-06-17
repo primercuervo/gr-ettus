@@ -76,6 +76,7 @@ class ModToolNewModule(ModTool):
                 s = open(f, 'r').read()
                 s = s.replace('rfnoc_example', self._info['modname'])
                 s = s.replace('RFNOC_EXAMPLE', self._info['modname'].upper())
+                s = s.replace('SOURCES_PATH', os.path.join(os.getcwd(),'rfnoc-newmod','rfnoc','fpga-src')+',\\\n')
                 open(f, 'w').write(s)
                 if filename.find('rfnoc_example') != -1:
                     os.rename(f, os.path.join(root, filename.replace('rfnoc_example', self._info['modname'])))

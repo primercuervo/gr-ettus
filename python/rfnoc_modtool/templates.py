@@ -426,7 +426,7 @@ class UHD_API ${blockname}_block_ctrl : public source_block_ctrl_base, public si
 {
 public:
     UHD_RFNOC_BLOCK_OBJECT(${blockname}_block_ctrl)
-    
+
     /*!
      * Your block configuration here
     */
@@ -666,6 +666,16 @@ Templates['grc_xml'] = '''<?xml version="1.0"?>
           ${strip_arg_types_grc($arglist)},
 #end if
           self.device3,
+          uhd.stream_args( \# TX Stream Args
+                cpu_format="\$type",
+                otw_format="\$otw",
+                args=""
+          ),
+          uhd.stream_args( \# RX Stream Args
+                cpu_format="\$type",
+                otw_format="\$otw",
+                args=""
+          ),
           \$block_index,
           \$device_index
 #else
@@ -680,6 +690,31 @@ Templates['grc_xml'] = '''<?xml version="1.0"?>
 
 
 #if $blocktype == 'rfnoc'
+  <param>
+    <name>Host Data Type</name>
+    <key>type</key>
+    <type>enum</type>
+    <option>
+      <name>Complex float32</name>
+      <key>fc32</key>
+      <opt>type:complex</opt>
+    </option>
+    <option>
+      <name>Complex int16</name>
+      <key>sc16</key>
+      <opt>type:sc16</opt>
+    </option>
+    <option>
+      <name>Byte</name>
+      <key>u8</key>
+      <opt>type:byte</opt>
+    </option>
+    <option>
+      <name>VITA word32</name>
+      <key>item32</key>
+      <opt>type:s32</opt>
+    </option>
+  </param>
   <!--RFNoC basic block configuration -->
   <param>
     <name>Device Select</name>
@@ -699,20 +734,6 @@ Templates['grc_xml'] = '''<?xml version="1.0"?>
     <tab>RFNoC Config</tab>
   </param>
 
-  <param>
-    <name>Device3</name>
-    <key>device3</key>
-    <value>variable_uhd_device3_0</value>
-    <type>string</type>
-    <hide>
-      \#if \$dev_addr()
-      none
-      \#else
-      part
-      \#end if
-    </hide>
-    <tab>RFNoC Config</tab>
-  </param>
 #end if
   <param>
     <name>...</name>
@@ -727,7 +748,8 @@ Templates['grc_xml'] = '''<?xml version="1.0"?>
        * optional (set to 1 for optional inputs) -->
   <sink>
     <name>in</name>
-    <type><!-- e.g. int, float, complex, byte, short, xxx_vector, ...--></type>
+    <type>\$type.type</type>
+    <domain>rfnoc</domain>
   </sink>
 
   <!-- Make one 'source' node per output. Sub-nodes:
@@ -737,7 +759,8 @@ Templates['grc_xml'] = '''<?xml version="1.0"?>
        * optional (set to 1 for optional inputs) -->
   <source>
     <name>out</name>
-    <type><!-- e.g. int, float, complex, byte, short, xxx_vector, ...--></type>
+    <type>\$type.type</type>
+    <domain>rfnoc</domain>
   </source>
 </block>
 '''
@@ -771,7 +794,7 @@ Templates['rfnoc_v'] = '''
 //
 
 module noc_block_$blockname \#(
-  parameter NOC_ID = 64'h${noc_id}_0000_0000_0000, //REMEMBER TO MODIFY ACCORDINGLY YOUR BLOCK_ID
+  parameter NOC_ID = 64'h${noc_id}_0000_0000_0000,
   parameter STR_SINK_FIFOSIZE = 11)
 (
   input bus_clk, input bus_rst,

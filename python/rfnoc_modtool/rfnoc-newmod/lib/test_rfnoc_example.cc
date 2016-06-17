@@ -39,7 +39,7 @@ main (int argc, char **argv)
   std::ofstream xmlfile(get_unittest_path("rfnoc_example.xml").c_str());
   CppUnit::XmlOutputter *xmlout = new CppUnit::XmlOutputter(&runner.result(), xmlfile);
 
-  runner.addTest(qa_rfnov_example::suite());
+  runner.addTest(qa_rfnoc_example::suite());
   runner.setOutputter(xmlout);
 
   bool was_successful = runner.run("", false);

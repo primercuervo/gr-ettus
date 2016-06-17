@@ -6,7 +6,7 @@ GR_PYTHON_INSTALL(FILES
 	    __init__.py
         cmakefile_editor.py
         code_generator.py
-        grc_xml_generator.py #not here
+        grc_xml_generator.py
         modtool_add.py
         modtool_base.py
         modtool_makexml.py
